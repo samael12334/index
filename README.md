@@ -1,28 +1,113 @@
-🔄 **HTML Edit Mode** - Processing your edit request...
 
-Here are the changes needed to update the hero section with a fruit field background while keeping everything else intact:
 
 ```diff
 <<<<<<< SEARCH
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ce81e5b4-3620-43fe-a86e-5709d85d43b5.png');
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" class="form-control" pattern="[0-9]{16}" required placeholder="1234 5678 9012 3456">
+                    </div>
 =======
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://placehold.co/1920x1080?text=Campo+de+Frutas+Frescas');
+                    <div class="form-group">
+                        <label>Tipo de Tarjeta</label>
+                        <select class="form-control" id="card-type" required>
+                            <option value="" disabled selected>Seleccione tipo</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="american-express">American Express</option>
+                            <option value="diners">Diners Club</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" class="form-control" pattern="[0-9]{16}" required placeholder="1234 5678 9012 3456">
+                        <div id="card-icon" style="margin-top: 5px;"></div>
+                    </div>
 >>>>>>> REPLACE
-
+```
 
 ```
+
+
 ```diff
 <<<<<<< SEARCH
-    <section class="hero" id="inicio">
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('¡Pago realizado con éxito!');
+            document.getElementById('payment-modal').style.display = 'none';
+        });
 =======
-    <section class="hero" id="inicio" style="outline: rgb(0, 0, 0) dotted 3px; outline-offset: 1px;">
+        // Detectar tipo de tarjeta y mostrar icono
+        document.querySelector('input[type="text"][pattern="[0-9]{16}"]').addEventListener('input', function(e) {
+            const cardNumber = e.target.value;
+            const cardType = detectCardType(cardNumber);
+            const cardIcon = document.getElementById('card-icon');
+            
+            cardIcon.innerHTML = cardType ? 
+                `<img src="https://placehold.co/40x25?text=${cardType.toUpperCase()}" alt="${cardType}" style="height:25px;">` : 
+                '';
+        });
+
+        function detectCardType(cardNumber) {
+            if (/^4/.test(cardNumber)) return 'visa';
+            if (/^5[1-5]/.test(cardNumber)) return 'mastercard';
+            if (/^3[47]/.test(cardNumber)) return 'american-express';
+            if (/^36/.test(cardNumber)) return 'diners';
+            return '';
+        }
+
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cardType = document.getElementById('card-type').value;
+            const cardNumber = document.querySelector('input[type="text"][pattern="[0-9]{16}"]').value;
+            
+            if (!cardType) {
+                alert('Por favor seleccione el tipo de tarjeta');
+                return;
+            }
+            
+            const detectedType = detectCardType(cardNumber);
+            if (cardType !== detectedType && detectedType) {
+                alert(`El número parece ser una tarjeta ${detectedType.toUpperCase()}, pero seleccionó ${cardType.toUpperCase()}`);
+                return;
+            }
+            
+            alert(`¡Pago realizado con éxito con tarjeta ${cardType.toUpperCase()}!`);
+            document.getElementById('payment-modal').style.display = 'none';
+        });
+>>>>>>> REPLACE
+```
+
+```
+
+
+```diff
+<<<<<<< SEARCH
+        #payment-form .form-group {
+            margin-bottom: 1rem;
+        }
+=======
+        #payment-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        #card-icon img {
+            vertical-align: middle;
+            margin-left: 10px;
+        }
 >>>>>>> REPLACE
 ```
 
 
-Summary:
-1. Changed hero section background image to a fruit field placeholder
-2. Added temporary outline styling to highlight the hero section for visibilityHere is the updated HTML content after applying above edits:
+```
+These changes will:
+
+1. Add a card type selection dropdown
+2. Add visual identification of card type based on number pattern
+3. Include validation to ensure selected card type matches number pattern
+4. Show card type icon when user enters card number
+5. Style the new elements consistently
+
+The card detection works by checking the first digits of the card number according to standard patterns (Visa starts with 4, Mastercard 51-55, Amex 34/37, etc.). The user must select a card type that matches the detected pattern.Here is the updated HTML content after applying above edits:
 
 ```html
 <!DOCTYPE html>
@@ -103,7 +188,7 @@ Summary:
         
         .hero {
             height: 80vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://placehold.co/1920x1080?text=Campo+de+Frutas+Frescas');
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/787108e6-1626-4caa-b22c-011249d0c107.png');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -230,7 +315,63 @@ Summary:
             color: var(--naranja);
             font-weight: bold;
             font-size: 1.2rem;
-            margin: 0.5rem 0;
+            margin: 0.5rem 0 1rem 0;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        
+        .quantity {
+            width: 50px;
+            text-align: center;
+            margin: 0 0.5rem;
+            padding: 0.5rem;
+        }
+        
+        .btn-add {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            background-color: var(--verde-primario);
+        }
+        
+        .btn-add:hover {
+            background-color: var(--verde-secundario);
+        }
+        
+        #payment-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        #card-icon img {
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        
+        .cart-btn {
+            position: relative;
+            color: var(--blanco);
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--naranja);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .contact {
@@ -376,6 +517,12 @@ Summary:
                     <h3>Fresas Frescas</h3>
                     <div class="product-price">$3.99 / lb</div>
                     <p>Fresas dulces y jugosas, cosechadas en su punto óptimo de maduración.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -387,6 +534,12 @@ Summary:
                     <h3>Tomates Orgánicos</h3>
                     <div class="product-price">$2.49 / lb</div>
                     <p>Tomates cultivados sin pesticidas, con todo su sabor natural.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -398,6 +551,12 @@ Summary:
                     <h3>Aguacates Hass</h3>
                     <div class="product-price">$2.99 / unidad</div>
                     <p>Aguacates cremosos, perfectos para guacamoles y ensaladas.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -409,6 +568,12 @@ Summary:
                     <h3>Lechugas Frescas</h3>
                     <div class="product-price">$1.99 / unidad</div>
                     <p>Lechugas crujientes, recién cosechadas y prelavadas.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -420,6 +585,12 @@ Summary:
                     <h3>Manzanas Selectas</h3>
                     <div class="product-price">$1.49 / lb</div>
                     <p>Manzanas dulces y jugosas, perfectas para comer o cocinar.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -431,6 +602,12 @@ Summary:
                     <h3>Zanahorias Orgánicas</h3>
                     <div class="product-price">$1.29 / lb</div>
                     <p>Zanahorias dulces y crujientes, ricas en nutrientes.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
         </div>
@@ -481,7 +658,110 @@ Summary:
         </div>
     </footer>
     
-    <script>
+    <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; display:flex; justify-content:center; align-items:center;">
+            <div style="background:white; padding:2rem; border-radius:10px; max-width:500px;">
+                <h2>Información de Pago</h2>
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label>Tipo de Tarjeta</label>
+                        <select class="form-control" id="card-type" required>
+                            <option value="" disabled selected>Seleccione tipo</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="american-express">American Express</option>
+                            <option value="diners">Diners Club</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" class="form-control" pattern="[0-9]{16}" required placeholder="1234 5678 9012 3456">
+                        <div id="card-icon" style="margin-top: 5px;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Expiración</label>
+                        <input type="text" class="form-control" pattern="[0-9]{2}/[0-9]{2}" required placeholder="MM/AA">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" class="form-control" pattern="[0-9]{3}" required placeholder="123">
+                    </div>
+                    <button type="submit" class="btn">Pagar</button>
+                    <button type="button" class="btn" onclick="closePaymentModal()">Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        // Funcionalidad de compra
+        document.querySelectorAll('.btn-add').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productName = productCard.querySelector('h3').textContent;
+                const productPrice = productCard.querySelector('.product-price').textContent;
+                const quantity = productCard.querySelector('.quantity').value;
+                
+                document.getElementById('payment-modal').style.display = 'flex';
+            });
+        });
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+
+        // Detectar tipo de tarjeta y mostrar icono
+        document.querySelector('input[type="text"][pattern="[0-9]{16}"]').addEventListener('input', function(e) {
+            const cardNumber = e.target.value;
+            const cardType = detectCardType(cardNumber);
+            const cardIcon = document.getElementById('card-icon');
+            
+            cardIcon.innerHTML = cardType ? 
+                `<img src="https://placehold.co/40x25?text=${cardType.toUpperCase()}" alt="${cardType}" style="height:25px;">` : 
+                '';
+        });
+
+        function detectCardType(cardNumber) {
+            if (/^4/.test(cardNumber)) return 'visa';
+            if (/^5[1-5]/.test(cardNumber)) return 'mastercard';
+            if (/^3[47]/.test(cardNumber)) return 'american-express';
+            if (/^36/.test(cardNumber)) return 'diners';
+            return '';
+        }
+
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cardType = document.getElementById('card-type').value;
+            const cardNumber = document.querySelector('input[type="text"][pattern="[0-9]{16}"]').value;
+            
+            if (!cardType) {
+                alert('Por favor seleccione el tipo de tarjeta');
+                return;
+            }
+            
+            const detectedType = detectCardType(cardNumber);
+            if (cardType !== detectedType && detectedType) {
+                alert(`El número parece ser una tarjeta ${detectedType.toUpperCase()}, pero seleccionó ${cardType.toUpperCase()}`);
+                return;
+            }
+            
+            alert(`¡Pago realizado con éxito con tarjeta ${cardType.toUpperCase()}!`);
+            document.getElementById('payment-modal').style.display = 'none';
+        });
+
+        // Controles de cantidad
+        document.querySelectorAll('.plus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.value < 10) input.value++;
+            });
+        });
+
+        document.querySelectorAll('.minus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.nextElementSibling;
+                if (input.value > 1) input.value--;
+            });
+        });
+
         // Formulario de contacto
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -717,7 +997,63 @@ Summary:
             color: var(--naranja);
             font-weight: bold;
             font-size: 1.2rem;
-            margin: 0.5rem 0;
+            margin: 0.5rem 0 1rem 0;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        
+        .quantity {
+            width: 50px;
+            text-align: center;
+            margin: 0 0.5rem;
+            padding: 0.5rem;
+        }
+        
+        .btn-add {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            background-color: var(--verde-primario);
+        }
+        
+        .btn-add:hover {
+            background-color: var(--verde-secundario);
+        }
+        
+        #payment-form .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        #card-icon img {
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        
+        .cart-btn {
+            position: relative;
+            color: var(--blanco);
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--naranja);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .contact {
@@ -863,6 +1199,12 @@ Summary:
                     <h3>Fresas Frescas</h3>
                     <div class="product-price">$3.99 / lb</div>
                     <p>Fresas dulces y jugosas, cosechadas en su punto óptimo de maduración.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -874,6 +1216,12 @@ Summary:
                     <h3>Tomates Orgánicos</h3>
                     <div class="product-price">$2.49 / lb</div>
                     <p>Tomates cultivados sin pesticidas, con todo su sabor natural.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -885,6 +1233,12 @@ Summary:
                     <h3>Aguacates Hass</h3>
                     <div class="product-price">$2.99 / unidad</div>
                     <p>Aguacates cremosos, perfectos para guacamoles y ensaladas.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -896,6 +1250,12 @@ Summary:
                     <h3>Lechugas Frescas</h3>
                     <div class="product-price">$1.99 / unidad</div>
                     <p>Lechugas crujientes, recién cosechadas y prelavadas.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -907,6 +1267,12 @@ Summary:
                     <h3>Manzanas Selectas</h3>
                     <div class="product-price">$1.49 / lb</div>
                     <p>Manzanas dulces y jugosas, perfectas para comer o cocinar.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
             
@@ -918,6 +1284,12 @@ Summary:
                     <h3>Zanahorias Orgánicas</h3>
                     <div class="product-price">$1.29 / lb</div>
                     <p>Zanahorias dulces y crujientes, ricas en nutrientes.</p>
+                    <div class="quantity-controls">
+                        <button class="btn minus">-</button>
+                        <input type="number" class="quantity" value="1" min="1" max="10">
+                        <button class="btn plus">+</button>
+                    </div>
+                    <button class="btn btn-add">Comprar ahora</button>
                 </div>
             </div>
         </div>
@@ -968,7 +1340,110 @@ Summary:
         </div>
     </footer>
     
-    <script>
+    <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; display:flex; justify-content:center; align-items:center;">
+            <div style="background:white; padding:2rem; border-radius:10px; max-width:500px;">
+                <h2>Información de Pago</h2>
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label>Tipo de Tarjeta</label>
+                        <select class="form-control" id="card-type" required>
+                            <option value="" disabled selected>Seleccione tipo</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="american-express">American Express</option>
+                            <option value="diners">Diners Club</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" class="form-control" pattern="[0-9]{16}" required placeholder="1234 5678 9012 3456">
+                        <div id="card-icon" style="margin-top: 5px;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Expiración</label>
+                        <input type="text" class="form-control" pattern="[0-9]{2}/[0-9]{2}" required placeholder="MM/AA">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" class="form-control" pattern="[0-9]{3}" required placeholder="123">
+                    </div>
+                    <button type="submit" class="btn">Pagar</button>
+                    <button type="button" class="btn" onclick="closePaymentModal()">Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        // Funcionalidad de compra
+        document.querySelectorAll('.btn-add').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productName = productCard.querySelector('h3').textContent;
+                const productPrice = productCard.querySelector('.product-price').textContent;
+                const quantity = productCard.querySelector('.quantity').value;
+                
+                document.getElementById('payment-modal').style.display = 'flex';
+            });
+        });
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+
+        // Detectar tipo de tarjeta y mostrar icono
+        document.querySelector('input[type="text"][pattern="[0-9]{16}"]').addEventListener('input', function(e) {
+            const cardNumber = e.target.value;
+            const cardType = detectCardType(cardNumber);
+            const cardIcon = document.getElementById('card-icon');
+            
+            cardIcon.innerHTML = cardType ? 
+                `<img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/46e5fe9a-a4da-4ac0-a7d6-4aad513e9acd.png" alt="${cardType}" style="height:25px;">` : 
+                '';
+        });
+
+        function detectCardType(cardNumber) {
+            if (/^4/.test(cardNumber)) return 'visa';
+            if (/^5[1-5]/.test(cardNumber)) return 'mastercard';
+            if (/^3[47]/.test(cardNumber)) return 'american-express';
+            if (/^36/.test(cardNumber)) return 'diners';
+            return '';
+        }
+
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cardType = document.getElementById('card-type').value;
+            const cardNumber = document.querySelector('input[type="text"][pattern="[0-9]{16}"]').value;
+            
+            if (!cardType) {
+                alert('Por favor seleccione el tipo de tarjeta');
+                return;
+            }
+            
+            const detectedType = detectCardType(cardNumber);
+            if (cardType !== detectedType && detectedType) {
+                alert(`El número parece ser una tarjeta ${detectedType.toUpperCase()}, pero seleccionó ${cardType.toUpperCase()}`);
+                return;
+            }
+            
+            alert(`¡Pago realizado con éxito con tarjeta ${cardType.toUpperCase()}!`);
+            document.getElementById('payment-modal').style.display = 'none';
+        });
+
+        // Controles de cantidad
+        document.querySelectorAll('.plus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.value < 10) input.value++;
+            });
+        });
+
+        document.querySelectorAll('.minus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.nextElementSibling;
+                if (input.value > 1) input.value--;
+            });
+        });
+
         // Formulario de contacto
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -993,46 +1468,3 @@ Summary:
 </html>
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</html>
